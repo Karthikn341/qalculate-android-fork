@@ -374,9 +374,8 @@ class CalculatorViewModel @Inject constructor(
                 0,
                 _activeCalculationInput.value.input.text.length
             )
-        _activeCalculationInput.update {
-            it.copy(input = it.input.copy(selection = TextRange(newCursorPosition)))
-        }
+
+        updateInput(_activeCalculationInput.value.input.copy(selection = TextRange(newCursorPosition)))
     }
 
     fun updateInput(input: TextFieldValue, doAutocomplete: Boolean = false) {
