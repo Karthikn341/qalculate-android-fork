@@ -18,6 +18,8 @@ fun mathExpressionPlainText(
             "</sup>" -> ")"
             "<sub>" -> ""
             "</sub>" -> ""
+            "<small>" -> ""
+            "</small>" -> ""
             "&nbsp;" -> ""
             "&lt;" -> "<"
             "&gt;" -> ">"

@@ -33,6 +33,8 @@ fun mathExpressionFormatter(
                 "</sup>" -> pop()
                 "<sub>" -> pushStyle(SpanStyle(baselineShift = BaselineShift.Subscript, fontSize = 0.7.em))
                 "</sub>" -> pop()
+                "<small>" -> pushStyle(SpanStyle(fontSize = 0.7.em))
+                "</small>" -> pop()
                 "&nbsp;" -> append("")
                 "&lt;" -> append("<")
                 "&gt;" -> append(">")
