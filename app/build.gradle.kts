@@ -59,42 +59,9 @@ android {
         }
     }
 
-    androidComponents {
-        onVariants { variant ->
-
-            // Assigns a different version code for each output APK
-            // other than the universal APK.
-            variant.outputs.forEach { output ->
-                val name =
-                    if (splitApks) {
-                        output.filters.find { it.filterType == ABI }?.identifier
-                    } else {
-                        abiFilterList.firstOrNull()
-                    }
-
-                // Stores the value of abiCodes that is associated with the ABI for this variant.
-                val baseAbiCode = abiCodes[name]
-                // Because abiCodes.get() returns null for ABIs that are not mapped by ext.abiCodes,
-                // the following code doesn't override the version code for universal APKs.
-                // However, because you want universal APKs to have the lowest version code,
-                // this outcome is desirable.
-                if (baseAbiCode != null) {
-                    // Assigns the new version code to output.versionCode, which changes the version code
-                    // for only the output APK, not for the variant itself.
-                    output.versionCode.set(10*(output.versionCode.get() ?: 0) + baseAbiCode)
-                }
-            }
-        }
-    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlin {
-        compilerOptions {
-            languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
-        }
     }
     buildFeatures {
         compose = true
@@ -108,9 +75,44 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    room {
-        schemaDirectory("$projectDir/schemas")
+}
+
+kotlin {
+    compilerOptions {
+        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
     }
+}
+
+androidComponents {
+    onVariants { variant ->
+
+        // Assigns a different version code for each output APK
+        // other than the universal APK.
+        variant.outputs.forEach { output ->
+            val name =
+                if (splitApks) {
+                    output.filters.find { it.filterType == ABI }?.identifier
+                } else {
+                    abiFilterList.firstOrNull()
+                }
+
+            // Stores the value of abiCodes that is associated with the ABI for this variant.
+            val baseAbiCode = abiCodes[name]
+            // Because abiCodes.get() returns null for ABIs that are not mapped by ext.abiCodes,
+            // the following code doesn't override the version code for universal APKs.
+            // However, because you want universal APKs to have the lowest version code,
+            // this outcome is desirable.
+            if (baseAbiCode != null) {
+                // Assigns the new version code to output.versionCode, which changes the version code
+                // for only the output APK, not for the variant itself.
+                output.versionCode.set(10*(output.versionCode.get() ?: 0) + baseAbiCode)
+            }
+        }
+    }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {
