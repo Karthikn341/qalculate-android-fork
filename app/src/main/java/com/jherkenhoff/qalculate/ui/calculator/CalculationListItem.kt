@@ -1,21 +1,13 @@
 package com.jherkenhoff.qalculate.ui.calculator
 
-import android.content.ClipData
-import android.util.Log
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -53,20 +45,15 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.InterceptPlatformTextInput
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -82,10 +69,11 @@ import androidx.compose.ui.unit.sp
 import com.jherkenhoff.qalculate.R
 import com.jherkenhoff.qalculate.model.CalculatorAction
 import com.jherkenhoff.qalculate.model.UserPreferences
+import com.jherkenhoff.qalculate.ui.PreviewData
+import com.jherkenhoff.qalculate.ui.common.AdaptiveLeadTrailRow
 import com.jherkenhoff.qalculate.ui.common.mathExpressionFormatter
 import com.jherkenhoff.qalculate.ui.common.mathExpressionPlainText
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
 private val largeCornerRadius = 16.dp
@@ -237,7 +225,6 @@ fun ReorderableCollectionItemScope.ActiveCalculationListItem(
     }
 }
 
-
 @Composable
 fun PassiveCalculationListItem(
     id: Long,
@@ -293,33 +280,39 @@ fun PassiveCalculationListItem(
                     )
                 }
                 VerticalDivider(Modifier.padding(vertical = 8.dp))
-                Text(
-                    input,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp, horizontal = 8.dp)
-                        .sharedElement(
-                            rememberSharedContentState("input"),
-                            animatedVisibilityScope
-                        ).onLongPress({
-                            clipboardManager.setText(
-                                AnnotatedString(input)
-                            )
-                        })
-                )
-                Spacer(Modifier.weight(1f))
-                Text(
-                    mathExpressionFormatter(result),
-                    textAlign = TextAlign.End,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .sharedElement(
-                            rememberSharedContentState("result"),
-                            animatedVisibilityScope
-                        ).onLongPress({
-                            clipboardManager.setText(
-                                AnnotatedString(mathExpressionPlainText(result))
-                            )
-                        })
+                AdaptiveLeadTrailRow(
+                    leading = {
+                        Text(
+                            input,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp, horizontal = 8.dp)
+                                .sharedElement(
+                                    rememberSharedContentState("input"),
+                                    animatedVisibilityScope
+                                ).onLongPress({
+                                    clipboardManager.setText(
+                                        AnnotatedString(input)
+                                    )
+                                })
+                        )
+                    },
+                    trailing = {
+                        Text(
+                            mathExpressionFormatter(result),
+                            textAlign = TextAlign.End,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .sharedElement(
+                                    rememberSharedContentState("result"),
+                                    animatedVisibilityScope
+                                ).onLongPress({
+                                    clipboardManager.setText(
+                                        AnnotatedString(mathExpressionPlainText(result))
+                                    )
+                                })
+                        )
+                    },
+                    modifier = Modifier.weight(1f)
                 )
                 Box(
                 ) {
@@ -461,16 +454,20 @@ private fun Menu(
 private fun PassivePreview() {
     SharedTransitionLayout() {
         AnimatedVisibility(true) {
-            PassiveCalculationListItem(
-                0,
-                "1+1",
-                "0",
-                1,
-                topRounded = false,
-                bottomRounded = false,
-                sharedTransitionScope = this@SharedTransitionLayout,
-                animatedVisibilityScope = this@AnimatedVisibility
-            )
+            Column() {
+                PreviewData.calculationList.forEach {
+                    PassiveCalculationListItem(
+                        it.id,
+                        it.input,
+                        it.result,
+                        it.executionOrderNumber,
+                        topRounded = false,
+                        bottomRounded = false,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedVisibilityScope = this@AnimatedVisibility
+                    )
+                }
+            }
         }
     }
 }
