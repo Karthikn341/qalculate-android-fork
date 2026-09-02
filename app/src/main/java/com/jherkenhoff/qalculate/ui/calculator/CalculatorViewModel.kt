@@ -84,7 +84,23 @@ class CalculatorViewModel @Inject constructor(
 
                     if (activeId == null || list.none { it.id == activeId }) {
                         list.lastOrNull()?.let { lastCalculation ->
-                            changeActiveCalculation(lastCalculation.id)
+
+                            if (lastCalculation.input.isEmpty()) {
+                                changeActiveCalculation(lastCalculation.id)
+                            } else {
+                                calculationListRepository.insertBelow(
+                                    lastCalculation.id,
+                                    CalculationHistoryItemData(
+                                        sortIndex = persistentCalculationList.value.last().sortIndex + 1.0,
+                                        input = "",
+                                        parsed = "",
+                                        result = "",
+                                        created = LocalDateTime.now(),
+                                        modified = LocalDateTime.now()
+                                    )
+                                )
+                            }
+
                         }
                     }
                 }
@@ -292,6 +308,8 @@ class CalculatorViewModel @Inject constructor(
     }
 
     fun deleteCalculation(id: Long) {
+        val deletedCalculationSortIndex = _calculationDragOrder.value?.indexOf(id)
+
         persistentCalculationList.value.find { it.id == id }?.let { calculation ->
             viewModelScope.launch {
                 calculationListRepository.deleteItem(calculation)
