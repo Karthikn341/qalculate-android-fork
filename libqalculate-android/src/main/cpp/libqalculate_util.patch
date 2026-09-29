@@ -1,6 +1,6 @@
---- libqalculate/util.cc	2021-12-03 14:29:16.233342931 +0100
-+++ libqalculate/util.cc	2021-12-03 14:20:38.398482918 +0100
-@@ -954,8 +954,8 @@
+--- libqalculate/util.cc
++++ libqalculate/util.cc
+@@ -1164,8 +1164,8 @@
  }
  
  void Thread::enableAsynchronousCancel() {
@@ -11,7 +11,8 @@
  }
  
  void *Thread::doRun(void *data) {
-@@ -978,7 +978,8 @@
+@@ -1184,7 +1184,8 @@
+ }
  
  bool Thread::cancel() {
  	if(!running) return true;
