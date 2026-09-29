@@ -45,9 +45,7 @@ android {
     }
 
     dependenciesInfo {
-        // Disables dependency metadata when building APKs.
         includeInApk = false
-        // Disables dependency metadata when building Android App Bundles.
         includeInBundle = false
     }
 
@@ -65,7 +63,6 @@ android {
     }
     buildFeatures {
         compose = true
-        // Disable unused AGP features
         aidl = false
         shaders = false
         buildConfig = true
@@ -85,26 +82,14 @@ kotlin {
 
 androidComponents {
     onVariants { variant ->
-
-        // Assigns a different version code for each output APK
-        // other than the universal APK.
         variant.outputs.forEach { output ->
-            val name =
-                if (splitApks) {
-                    output.filters.find { it.filterType == ABI }?.identifier
-                } else {
-                    abiFilterList.firstOrNull()
-                }
-
-            // Stores the value of abiCodes that is associated with the ABI for this variant.
+            val name = if (splitApks) {
+                output.filters.find { it.filterType == ABI }?.identifier
+            } else {
+                abiFilterList.firstOrNull()
+            }
             val baseAbiCode = abiCodes[name]
-            // Because abiCodes.get() returns null for ABIs that are not mapped by ext.abiCodes,
-            // the following code doesn't override the version code for universal APKs.
-            // However, because you want universal APKs to have the lowest version code,
-            // this outcome is desirable.
             if (baseAbiCode != null) {
-                // Assigns the new version code to output.versionCode, which changes the version code
-                // for only the output APK, not for the variant itself.
                 output.versionCode.set(10*(output.versionCode.get() ?: 0) + baseAbiCode)
             }
         }
@@ -134,7 +119,7 @@ dependencies {
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.iconsExtended)
-    implementation(libs.qalculate)
+    implementation(project(":libqalculate-android"))
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
